@@ -19,6 +19,7 @@ defmodule ExForce.OAuthTest do
   defp assert_form_body(conn, expected) do
     ["application/x-www-form-urlencoded" <> _] = Conn.get_req_header(conn, "content-type")
     {:ok, raw, conn} = Conn.read_body(conn)
+    raw = :zlib.gunzip(raw)
     assert URI.decode_query(raw) == expected
     conn
   end
@@ -336,10 +337,10 @@ defmodule ExForce.OAuthTest do
              post: [],
              pre: [
                {Tesla.Middleware.BaseUrl, :call, ["http://257.0.0.0:0"]},
-               {Tesla.Middleware.Compression, :call, [[format: "gzip"]]},
                {Tesla.Middleware.FormUrlencoded, :call, [[]]},
                {Tesla.Middleware.DecodeJson, :call, [[engine: Jason]]},
-               {Tesla.Middleware.Headers, :call, [[{"user-agent", "agent"}]]}
+               {Tesla.Middleware.Headers, :call, [[{"user-agent", "agent"}]]},
+               {Tesla.Middleware.Compression, :call, [[format: "gzip"]]}
              ]
            }
   end

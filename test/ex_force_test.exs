@@ -37,6 +37,7 @@ defmodule ExForceTest do
   defp assert_json_body(conn, expected) do
     assert_req_header(conn, "content-type", ["application/json"])
     assert {:ok, raw, conn} = Conn.read_body(conn)
+    raw = :zlib.gunzip(raw)
     assert Jason.decode!(raw) == expected
     conn
   end
